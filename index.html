@@ -218,7 +218,7 @@
         <div class="list" id="staysList"></div>
       </div></div>
       <div class="card"><div class="pad">
-        <div class="sec-head"><h3 class="sec-title">Mapa</h3></div>
+        <div class="sec-head"><h3 id="mapa" class="sec-title">Mapa</h3></div>
         <div id="map" class="map-wrap" aria-label="Mapa Leaflet"></div>
       </div></div>
     </section>
@@ -553,7 +553,7 @@
     catch{ prompt('Copia manualmente:', location.href); }
   });
   document.getElementById('gotoMap').addEventListener('click', ()=>{
-    document.querySelector('a[href="#mapa"]').scrollIntoView({behavior:'smooth'});
+    document.getElementById('mapa').scrollIntoView({behavior:'smooth'});
   });
 
   // Boot
