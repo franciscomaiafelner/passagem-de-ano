@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NYE on a Shoestring — Budapeste → Cracóvia → Praga</title>
+  <meta name="description" content="Itinerário low‑cost de 29/12 a 03/01: Budapeste, Cracóvia e Praga — voos, transportes, hostels, mapa e plano dia‑a‑dia."/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <style>
+    :root{
+      --bg: #0b0d12;
+      --card: rgba(255,255,255,0.08);
+      --frost: rgba(255,255,255,0.06);
+      --text: #e9edf1;
+      --muted:#a9b1bc;
+      --bud:#ff4db8; /* Budapeste vibe ruin bar */
+      --krk:#ffb703; /* Cracóvia âmbar */
+      --prg:#5ec2ff; /* Praga azul gelo */
+      --accent:#8be28b; /* sucesso/esverdeado */
+      --danger:#ff6b6b;
+      --link:#93c5fd;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; background: radial-gradient(1200px 700px at 80% -10%, rgba(255,77,184,.15), transparent 60%),
+                 radial-gradient(1200px 700px at 20% -10%, rgba(94,194,255,.12), transparent 60%),
+                 var(--bg);
+      color:var(--text); font-family:Poppins, Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    a{color:var(--link); text-decoration:none}
+    a:hover{text-decoration:underline}
+    .container{width:min(1180px, 92vw); margin-inline:auto}
+    .hero{
+      padding: clamp(28px, 5vw, 64px) 0 24px;
+      position:relative;
+    }
+    .badge{
+      display:inline-flex; gap:8px; align-items:center; font-size:.9rem; color:#0d1117; font-weight:700;
+      background:linear-gradient(90deg, var(--bud), var(--prg)); padding:8px 12px; border-radius:999px;
+      box-shadow: var(--shadow);
+    }
+    .title{
+      font-size:clamp(28px, 4.5vw, 56px); line-height:1.05; font-weight:800; margin:14px 0 10px;
+    }
+    .subtitle{font-size: clamp(16px, 2.2vw, 22px); color:var(--muted); margin-bottom:22px}
+    .price-row{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin:12px 0 24px}
+    .price{
+      font-weight:800; font-size: clamp(22px, 3.2vw, 34px);
+      background:linear-gradient(90deg, var(--accent), #aaf0aa); -webkit-background-clip:text; color:transparent;
+    }
+    .cta{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      --bgc: #1b2130; --bdc: #2b3345; --txt: #e7eef5;
+      background: var(--bgc); color: var(--txt); border:1px solid var(--bdc);
+      padding: 10px 14px; border-radius: 12px; font-weight:700; cursor:pointer; transition:.2s transform;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn.primary{--bgc:linear-gradient(90deg, var(--bud), var(--prg)); --bdc:transparent; color:#0d1117}
+    .btn.ghost{background:transparent; border-color:#384255}
+    .quick-gallery{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:18px}
+    .quick-gallery img{width:100%; aspect-ratio: 16/10; object-fit:cover; border-radius:14px; border:1px solid #2a3344; filter:saturate(1.1)}
+
+    .nav{
+      position:sticky; top:0; backdrop-filter:saturate(150%) blur(10px); background: rgba(10,12,18,.6);
+      border-bottom:1px solid #1d2533; z-index:99;
+    }
+    .nav .bar{display:flex; gap:12px; align-items:center; padding:10px 0; overflow:auto; scrollbar-width:none}
+    .nav a{white-space:nowrap; padding:8px 12px; border-radius:999px; border:1px solid #283247; background:rgba(255,255,255,.03)}
+
+    section{padding: 36px 0}
+    .grid{display:grid; gap:18px}
+    .two{grid-template-columns: 1.1fr .9fr}
+    @media (max-width: 900px){.two{grid-template-columns: 1fr}}
+
+    .card{background: var(--card); border:1px solid #273146; border-radius: var(--radius); box-shadow: var(--shadow)}
+    .card .pad{padding:18px}
+    .sec-head{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+    .sec-title{font-size: clamp(18px, 2.3vw, 26px); font-weight:800}
+    .muted{color:var(--muted)}
+
+    details{background:var(--frost); border:1px solid #26324a; border-radius:16px}
+    details > summary{cursor:pointer; padding:12px 14px; font-weight:700; list-style:none}
+    details > summary::-webkit-details-marker{display:none}
+
+    .list{display:grid; gap:12px}
+    .item{display:grid; grid-template-columns: 96px 1fr; gap:12px; padding:12px; background:rgba(255,255,255,.03); border:1px solid #273146; border-radius:14px}
+    .item img{width:96px; height:96px; object-fit:cover; border-radius:10px; border:1px solid #2b3650}
+    .item .h{font-weight:700; margin-bottom:6px}
+    .pill{display:inline-flex; align-items:center; gap:6px; padding:2px 8px; border:1px solid #30405c; border-radius:999px; color:#cdd7e6; font-size:12px}
+    .tags{display:flex; gap:8px; flex-wrap:wrap}
+
+    .timeline{position:relative}
+    .timeline::before{content:""; position:absolute; left:18px; top:0; bottom:0; width:2px; background:#2a354c}
+    .t-row{display:grid; grid-template-columns: 40px 1fr; gap:10px; padding:12px 0}
+    .dot{width:12px; height:12px; border-radius:999px; margin-top:4px}
+    .dot.m{background:var(--bud)} .dot.t{background:var(--krk)} .dot.n{background:var(--prg)}
+
+    .map-wrap{height: 440px; border-radius:16px; overflow:hidden; border:1px solid #273146}
+
+    .city-chip{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; border:1px solid #2c3a54}
+    .chip-bud{background: linear-gradient(90deg, rgba(255,77,184,.2), transparent)}
+    .chip-krk{background: linear-gradient(90deg, rgba(255,183,3,.2), transparent)}
+    .chip-prg{background: linear-gradient(90deg, rgba(94,194,255,.2), transparent)}
+
+    .footer{padding:28px 0 60px; color:#93a0b3}
+    .tiny{font-size:12px; color:#93a0b3}
+
+    .sticky-cta{
+      position:fixed; right:14px; bottom:14px; display:flex; gap:8px; z-index:98;
+    }
+
+    /* Print */
+    @media print{
+      .nav,.sticky-cta,.quick-gallery{display:none}
+      body{background:#fff; color:#000}
+      .card, details{border-color:#ddd}
+    }
+  </style>
+</head>
+<body>
+  <header class="hero container">
+    <span class="badge" aria-label="Trip badge">🎉 Réveillon dos Pobres (mas épico)</span>
+    <h1 class="title">NYE on a Shoestring — BUD → KRK → PRG</h1>
+    <p class="subtitle">29 Dez → 3 Jan • 4 jovens • diversão máxima com orçamento mínimo</p>
+    <div class="price-row">
+      <div class="price" aria-live="polite">≈ €350–€450 por pessoa</div>
+      <div class="tags">
+        <span class="pill">Hostels party‑friendly</span>
+        <span class="pill">Ruin bars • Beer spas • Pub crawls</span>
+        <span class="pill">Transportes low‑cost</span>
+      </div>
+    </div>
+    <div class="cta">
+      <a href="#itinerario" class="btn primary">Ver Itinerário</a>
+      <a href="#mapa" class="btn ghost">Abrir Mapa</a>
+      <button id="copyLink" class="btn" title="Copia o link desta viagem">Copiar link da viagem</button>
+    </div>
+    <div class="quick-gallery" aria-label="Galeria de 3 fotos (placeholders)">
+      <img src="https://thumbs.dreamstime.com/b/ano-novo-na-cidade-budapest-com-fogos-de-artif%C3%ADcio-79889316.jpg" alt="Foto de Budapeste (placeholder)"/>
+      <img src="https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,c_limit,e_sharpen,e_improve,e_vibrance:60/propertyimages/9/96090/fskh7fjvonmmmtgj3qda.jpg" alt="Foto de Praga (placeholder)"/>
+      <img src="https://omundomechama.com/wp-content/uploads/2022/02/SPARTY-Budapeste-2.jpg" alt="Foto de Cracóvia (placeholder)"/>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="container bar">
+      <a href="#overview">Overview</a>
+      <a href="#voos">Voos</a>
+      <a href="#intercidades">Entre cidades</a>
+      <a href="#alojamento">Alojamento</a>
+      <a href="#itinerario">Dia‑a‑dia</a>
+      <a href="#anonovo">Ano Novo</a>
+      <a href="#mapa">Mapa</a>
+      <a href="#orcamento">Orçamento</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <!-- OVERVIEW -->
+    <section id="overview" class="grid two">
+      <div class="card"><div class="pad">
+        <div class="sec-head">
+          <h2 class="sec-title">Resumo rápido</h2>
+          <div class="tags">
+            <span class="city-chip chip-bud">Budapeste</span>
+            <span class="city-chip chip-krk">Cracóvia</span>
+            <span class="city-chip chip-prg">Praga</span>
+          </div>
+        </div>
+        <p class="muted">Plano pensado para maximizar diversão: ruin bars, pub crawls, termas, mercados e clubes alternativos — tudo no orçamento.</p>
+        <details open>
+          <summary>Datas & vibe</summary>
+          <div class="list pad">
+            <div class="item">
+              <img src="https://static.vecteezy.com/ti/vetor-gratis/p1/7145303-calendario-bebida-e-cap-conceito-de-evento-icone-desenhado-a-mao-vetor.jpg" alt="Placeholder datas">
+              <div>
+                <div class="h">29 Dez → 03 Jan</div>
+                <div class="muted">6 dias / 5 noites • 4 viajantes • foco em experiências locais e low‑cost.</div>
+              </div>
+            </div>
+            <div class="item">
+              <img src="https://www.alltrails.com/_next/image?url=https%3A%2F%2Fimages.alltrails.com%2FeyJidWNrZXQiOiJhc3NldHMuYWxsdHJhaWxzLmNvbSIsImtleSI6InVwbG9hZHMvcGhvdG8vaW1hZ2UvODY4MDIyMTcvZTVlZjQyMzJhMmFhYzZiMDYyODU4MWI1MmY0ZmQ3YjAuanBnIiwiZWRpdHMiOnsidG9Gb3JtYXQiOiJ3ZWJwIiwicmVzaXplIjp7IndpZHRoIjoxMDgwLCJoZWlnaHQiOjcwMCwiZml0IjoiY292ZXIifSwicm90YXRlIjpudWxsLCJqcGVnIjp7InRyZWxsaXNRdWFudGlzYXRpb24iOnRydWUsIm92ZXJzaG9vdERlcmluZ2luZyI6dHJ1ZSwib3B0aW1pc2VTY2FucyI6dHJ1ZSwicXVhbnRpc2F0aW9uVGFibGUiOjN9fX0%3D&w=3840&q=75" alt="Placeholder vibe">
+              <div>
+                <div class="h">Ritmo</div>
+                <div class="muted">Manhãs leves, tardes culturais, noites elétricas. Com tempo para descanso (e ressaca).</div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div></div>
+      <div class="card"><div class="pad">
+        <div class="sec-head">
+          <h3 class="sec-title">Controlo rápido</h3>
+          <div class="tags">
+            <button id="expandAll" class="btn ghost">Expandir tudo</button>
+            <button id="collapseAll" class="btn ghost">Minimizar tudo</button>
+          </div>
+        </div>
+        <ul class="muted" style="line-height:1.7">
+          <li><strong>Âncoras</strong>: usa a barra para saltar entre secções.</li>
+          <li><strong>Imagens</strong>: substitui qualquer <code>placehold.co</code> por fotos reais.</li>
+          <li><strong>Links de compra</strong>: estão com placeholders — troca pelos teus links preferidos (Skyscanner, Hostelworld, etc.).</li>
+          <li><strong>Mapa</strong>: edita coordenadas na secção <em>DATA</em> no fim do ficheiro, se quiseres precisão.</li>
+        </ul>
+      </div></div>
+    </section>
+
+    <!-- VOOS -->
+    <section id="voos">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">Voos</h2></div>
+        <div class="list" id="flightsList"></div>
+      </div></div>
+    </section>
+
+    <!-- ENTRE CIDADES -->
+    <section id="intercidades">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">Transportes entre cidades</h2></div>
+        <div class="list" id="legsList"></div>
+      </div></div>
+    </section>
+
+    <!-- ALOJAMENTO -->
+    <section id="alojamento" class="grid two">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">Hostels (party‑friendly)</h2></div>
+        <div class="list" id="staysList"></div>
+      </div></div>
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h3 class="sec-title">Mapa de hostels</h3></div>
+        <div id="map" class="map-wrap" aria-label="Mapa Leaflet"></div>
+      </div></div>
+    </section>
+
+    <!-- ITINERÁRIO DIA-A-DIA -->
+    <section id="itinerario">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">Itinerário (29/12 → 03/01)</h2></div>
+        <div id="timeline" class="timeline"></div>
+      </div></div>
+    </section>
+
+    <!-- ANO NOVO -->
+    <section id="anonovo" class="grid two">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">31 de Dezembro — Opções</h2></div>
+        <details open>
+          <summary>Budapeste</summary>
+          <div class="list pad" id="nye-bud"></div>
+        </details>
+        <details>
+          <summary>Cracóvia</summary>
+          <div class="list pad" id="nye-krk"></div>
+        </details>
+        <details>
+          <summary>Praga</summary>
+          <div class="list pad" id="nye-prg"></div>
+        </details>
+      </div></div>
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h3 class="sec-title">Dicas rápidas</h3></div>
+        <ul class="muted" style="line-height:1.7">
+          <li>Reservar com antecedência (voos, hostels, festas/c ruzeiros).</li>
+          <li>Planear agasalhos — frio forte no Leste Europeu.</li>
+          <li>Free tours = pagar gorjeta justa (cash ajuda!).</li>
+          <li>Usar ATMs oficiais ou cartões sem taxas.</li>
+        </ul>
+      </div></div>
+    </section>
+
+    <!-- ORÇAMENTO -->
+    <section id="orcamento" class="grid two">
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h2 class="sec-title">Orçamento estimado (pp)</h2></div>
+        <ul class="muted" style="line-height:1.9">
+          <li><strong>Voos:</strong> €200</li>
+          <li><strong>Entre cidades:</strong> €60–€80</li>
+          <li><strong>Alojamento (5 noites):</strong> €50–€100</li>
+          <li><strong>Atividades/entradas:</strong> €20–€40</li>
+          <li><strong>Comida & noite:</strong> €20–€30/dia</li>
+          <li><strong>Total:</strong> ≈ €350–€450</li>
+        </ul>
+      </div></div>
+      <div class="card"><div class="pad">
+        <div class="sec-head"><h3 class="sec-title">Notas</h3></div>
+        <p class="muted">Valores indicativos para época de Ano Novo. Edita livremente na secção <em>DATA</em> no fim do ficheiro para refletir os teus preços/links.</p>
+      </div></div>
+    </section>
+  </main>
+
+  <div class="sticky-cta">
+    <a href="#voos" class="btn primary" title="Ir para voos">Comprar voos</a>
+    <a href="#alojamento" class="btn" title="Ir para hostels">Reservar hostels</a>
+    <a href="#mapa" class="btn ghost" title="Ir para o mapa" id="gotoMap">Mapa</a>
+  </div>
+
+  <footer class="footer container">
+    <div class="tiny">Feito com 💙 por vocês — planeado para amigos. Podes publicar no GitHub Pages/Netlify. Ctrl/Cmd+P imprime versão limpa.</div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+  // =============================
+  // DATA — edita à vontade
+  // =============================
+  const DATA = {
+    priceRange: "≈ €350–€450 pp",
+    flights: [
+      {
+        from: "Lisboa (LIS)", to: "Budapeste (BUD)", date: "29 Dez",
+        duration: "~4h30", price: "desde ~€50",
+        buyUrl: "https://www.skyscanner.pt/transporte/voos/lis/bud/251229/?adultsv2=1&cabinclass=economy&childrenv2=&ref=home&rtn=0&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+        img: "https://ichef.bbci.co.uk/ace/ws/640/amz/worldservice/live/assets/images/2015/03/25/150325151112_airplane_624x351_thinkstock.jpg.webp"
+      },
+      {
+        from: "Praga (PRG)", to: "Lisboa (LIS)", date: "03 Jan",
+        duration: "~3h40", price: "desde ~€60",
+        buyUrl: "https://www.skyscanner.pt/transporte/voos/prg/lis/260103/?adultsv2=1&cabinclass=economy&childrenv2=&ref=home&rtn=0&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false",
+        img: "https://ichef.bbci.co.uk/ace/ws/640/amz/worldservice/live/assets/images/2015/03/25/150325151112_airplane_624x351_thinkstock.jpg.webp"
+      }
+    ],
+    legs: [
+      {
+        cityFrom: "Budapeste", cityTo: "Cracóvia",
+        options: [
+          { kind: "Autocarro FlixBus", duration: "~7h40", price: "desde ~€28", buyUrl: "https://shop.flixbus.pt/search?departureCity=40de6527-8646-11e6-9066-549f350fcb0c&arrivalCity=40de7eb5-8646-11e6-9066-549f350fcb0c&route=Budapest-Krak%C3%B3w&rideDate=01.01.2026&adult=1&_locale=pt&departureCountryCode=HU&arrivalCountryCode=PL&features%5Bfeature.enable_distribusion%5D=1&features%5Bfeature.train_cities_only%5D=0&features%5Bfeature.auto_update_disabled%5D=0&features%5Bfeature.webc_search_us_veterans_promoted%5D=0&features%5Bfeature.webc_search_no_stations_limit%5D=0&features%5Bfeature.webc_station_search%5D=0&features%5Bfeature.webc_search_grouping_trips%5D=0&features%5Bfeature.darken_page%5D=1&atb_pdid=41fec251-1ac2-4ce5-baae-88c93d6118b2&_sp=25c704a2-8f3e-4048-9aa8-84e729a77539&_spnuid=5f99d0e8-af4f-4362-9adf-6611cef24f8b_1755425869838", img:"https://i2.res.24o.it/images2010/S24/Documenti/2024/03/28/Immagini/Ritagli/lu6mxrb0x31n1vn52jb-U41145707300JVw-1440x752@IlSole24Ore-Web.jpg" },
+          { kind: "Comboio Nocturno (EN463)", duration: "~10h", price: "desde ~€49.90", buyUrl: "https://www.rome2rio.com/pt/map/Budapeste/Crac%C3%B3via?departureDate=2026-01-01#r/Train", img:"https://i.ytimg.com/vi/ylfR9NHv1mo/hqdefault.jpg" }
+        ]
+      },
+      {
+        cityFrom: "Cracóvia", cityTo: "Praga",
+        options: [
+          { kind: "Autocarro FlixBus", duration: "~7h57", price: "desde ~€36", buyUrl: "https://shop.flixbus.pt/search?departureCity=40de7eb5-8646-11e6-9066-549f350fcb0c&arrivalCity=40de1ad1-8646-11e6-9066-549f350fcb0c&route=Crac%C3%B3via-Praga&rideDate=02.01.2026&adult=1&_locale=pt&departureCountryCode=PL&arrivalCountryCode=CZ&features%5Bfeature.enable_distribusion%5D=1&features%5Bfeature.train_cities_only%5D=0&features%5Bfeature.auto_update_disabled%5D=0&features%5Bfeature.webc_search_us_veterans_promoted%5D=0&features%5Bfeature.webc_search_no_stations_limit%5D=0&features%5Bfeature.webc_station_search%5D=0&features%5Bfeature.webc_search_grouping_trips%5D=0&features%5Bfeature.darken_page%5D=1&atb_pdid=41fec251-1ac2-4ce5-baae-88c93d6118b2&_sp=79b24653-b869-4238-bc12-e691150f9c5b&_spnuid=7376fa39-3081-4ddf-acd6-b5f7e0082901_1755425939075", img:"https://i2.res.24o.it/images2010/S24/Documenti/2024/03/28/Immagini/Ritagli/lu6mxrb0x31n1vn52jb-U41145707300JVw-1440x752@IlSole24Ore-Web.jpg" },
+          { kind: "Comboio EC/LeoExpress", duration: "~6h45–8h", price: "desde ~€18", buyUrl: "https://www.rome2rio.com/pt/map/Crac%C3%B3via/Praga?departureDate=2026-01-01", img:"https://i.ytimg.com/vi/ylfR9NHv1mo/hqdefault.jpg" }
+        ]
+      }
+    ],
+    stays: [
+      // Budapeste
+      { city: "Budapeste", name: "Maverick Urban Lodge", price: "~€8–20", link: "https://www.portuguese.hostelworld.com/pwa/hosteldetails.php/Maverick-Central-Market/Budapest/303065?from=2025-12-29&to=2025-12-31&guests=4&origin=microsite", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,e_sharpen,e_improve,e_vibrance:60/v1/propertyimages/3/303065/lnzscurpha7amoujnfc5", lat: 47.492, lng: 19.061 },
+      { city: "Budapeste", name: "Hostel One Budapest", price: "~€13–25", link: "https://www.hostelworld.com/pwa/hosteldetails.php/Onefam-Budapest/Budapest/88908?from=2025-12-29&to=2025-12-31&guests=4&origin=microsite", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,e_sharpen,e_improve,e_vibrance:60/v1/propertyimages/8/88908/lc3gvck7ngd0xhouurdn", lat: 47.498, lng: 19.058 },
+      // Cracóvia
+      { city: "Cracóvia", name: "Little Havana Party Hostel", price: "~€9–22", link: "https://www.hostelworld.com/pwa/s?q=Krakow,%20Poland&country=Poland&city=Krakow&type=city&id=285&from=2025-12-31&to=2026-01-01&guests=4&HostelNumber=96090&MoreOptions=true&page=1", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,h_320,c_limit,e_sharpen,e_improve,e_vibrance:60/v1/propertyimages/9/96090/fskh7fjvonmmmtgj3qda", lat: 50.061, lng: 19.939 },
+      { city: "Cracóvia", name: "Greg & Tom Beer House", price: "~€17–25", link: "https://www.portuguese.hostelworld.com/pwa/hosteldetails.php/Greg-Tom-Beer-House-Hostel/Krakow/71484?from=2025-12-31&to=2026-01-01&guests=4&origin=microsite", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,h_320,c_limit,e_sharpen,e_improve,e_vibrance:60/propertyimages/7/71484/rcnmuuvys1qiqhatkach.jpg", lat: 50.062, lng: 19.937 },
+      // Praga
+      { city: "Praga", name: "The Madhouse", price: "~€20–28", link: "https://www.hostelworld.com/pwa/hosteldetails.php/The-MadHouse-Prague/Prague/60936?from=2026-01-01&to=2026-01-03&guests=4&origin=micrositehttps://www.portuguese.hostelworld.com/pwa/s?q=Praga,%20Rep%C3%BAblica%20Checa&country=Rep%C3%BAblica%20Checa&city=Praga&type=city&id=19&from=2026-01-01&to=2026-01-03&guests=4&HostelNumber=5007&MoreOptions=true&page=1", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,e_sharpen,e_improve,e_vibrance:60/v1/propertyimages/6/60936/h7sfyl4yzwtdidu0zqs3", lat: 50.083, lng: 14.421 },
+      { city: "Praga", name: "Hostel Elf", price: "~€15–24", link: "https://www.portuguese.hostelworld.com/pwa/hosteldetails.php/Hostel-ELF/Prague/5007?from=2026-01-01&to=2026-01-03&guests=4&hpa_source=5007", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,e_sharpen,e_improve,e_vibrance:60/v1/propertyimages/5/5007/p5ctmqki4ybyknggqujd", lat: 50.088, lng: 14.443 },
+      { city: "Praga", name: "Plus Prague", price: "~€18–26", link: "https://www.portuguese.hostelworld.com/pwa/hosteldetails.php/PLUS-Prague/Prague/18239?from=2026-01-01&to=2026-01-03&guests=4&origin=microsite", 
+        img: "https://a.hwstatic.com/image/upload/f_auto,q_auto,w_1024,c_limit,e_sharpen,e_improve,e_vibrance:60/propertyimages/1/18239/3.jpg", lat: 50.107, lng: 14.448 }
+    ],
+    itinerary: [
+      {
+        date: "29/12", label:"Lisboa → Budapeste", city:"Budapeste",
+        morning:{text:"Voo matinal para Budapeste + check‑in", img:"https://placehold.co/300x300?text=Check-in"},
+        afternoon:{text:"Castelo de Buda e Bastião dos Pescadores; Ponte das Correntes", img:"https://placehold.co/300x300?text=Buda+Castle"},
+        night:{text:"Mercado Central + bar‑crawl (Szimpla → Grandio → Instant/Fogas)", img:"https://placehold.co/300x300?text=Ruin+Bars"}
+      },
+      {
+        date: "30/12", label:"Budapeste", city:"Budapeste",
+        morning:{text:"Free walking tour do centro", img:"https://placehold.co/300x300?text=Free+Tour"},
+        afternoon:{text:"Termas Széchenyi ou Géllert + Városliget", img:"https://placehold.co/300x300?text=Termas"},
+        night:{text:"Jantar no bairro judeu + jazz/bares alternativos", img:"https://placehold.co/300x300?text=Night"}
+      },
+      {
+        date: "31/12", label:"Budapeste → Cracóvia (ou Ficar)", city:"Cracóvia",
+        morning:{text:"Viagem (bus/ comboio) para Cracóvia • check‑in", img:"https://placehold.co/300x300?text=Bus/Train"},
+        afternoon:{text:"Kazimierz + mercados de Natal", img:"https://placehold.co/300x300?text=Kazimierz"},
+        night:{text:"ANO NOVO: concerto gratuito no Rynek Główny / club night", img:"https://placehold.co/300x300?text=NYE"}
+      },
+      {
+        date: "01/01", label:"Cracóvia → Praga", city:"Praga",
+        morning:{text:"Brunch + Castelo Wawel / Vístula", img:"https://placehold.co/300x300?text=Crac%C3%B3via"},
+        afternoon:{text:"Viagem para Praga + check‑in", img:"https://placehold.co/300x300?text=Praga"},
+        night:{text:"Passeio noturno: Praça Velha + Ponte Carlos", img:"https://placehold.co/300x300?text=Old+Town"}
+      },
+      {
+        date: "02/01", label:"Praga", city:"Praga",
+        morning:{text:"Castelo de Praga + Malá Strana", img:"https://placehold.co/300x300?text=Castelo"},
+        afternoon:{text:"Vyšehrad → Náplavka → Manifesto Market → Letná", img:"https://placehold.co/300x300?text=NPV+Letna"},
+        night:{text:"Bar tour: Cross Club, Vnitroblock, Chapeau Rouge / Beer Spa", img:"https://placehold.co/300x300?text=Bars"}
+      },
+      {
+        date: "03/01", label:"Praga → Lisboa", city:"Praga",
+        morning:{text:"Mercadinhos/ jardins; compras finais", img:"https://placehold.co/300x300?text=Shop"},
+        afternoon:{text:"Voo de regresso", img:"https://placehold.co/300x300?text=PRG%E2%86%92LIS"},
+        night:null
+      }
+    ],
+    nye: {
+      Budapeste: [
+        { title:"Praça Vörösmarty + margens do Danúbio", desc:"Festa gratuita com comida de rua e fogos; visual top no rio.", price:"€0", link:"https://www.google.com/maps/place/V%C3%B6r%C3%B6smarty+t%C3%A9r" },
+        { title:"Cruzeiro Danúbio NYE", desc:"Jantar + música + vista para os fogos (opções).", price:"€80–€150", link:"https://budapestrivercruise.com/" },
+        { title:"Sparty nas Termas", desc:"DJ + luzes nas piscinas Széchenyi/Géllert.", price:"€40–€90", link:"https://spartybooking.com/" }
+      ],
+      Cracóvia: [
+        { title:"Rynek Główny (praça principal)", desc:"Palco com concertos e show de luzes; festa até ~2h.", price:"€0", link:"https://www.google.com/maps/place/Rynek+G%C5%82%C3%B3wny" },
+        { title:"Coco / Prozak 2.0 / Teatro Cubano", desc:"Club nights com pacotes de Ano Novo.", price:"€30–€50", link:"https://www.google.com/search?q=Krakow+NYE+club+tickets" }
+      ],
+      Praga: [
+        { title:"Old Town & Wenceslas + Ponte Carlos", desc:"Sem fogos oficiais; locais soltam ao longo do Vltava.", price:"€0", link:"https://www.google.com/maps/place/Charles+Bridge" },
+        { title:"Cruzeiros no Vltava", desc:"Barcos reúnem‑se perto da Ponte Carlos à meia‑noite.", price:"€80–€140", link:"https://www.pragueexperience.com/events/new-years-eve.asp" }
+      ]
+    }
+  };
+
+  // =============================
+  // RENDER HELPERS
+  // =============================
+  const flightsList = document.getElementById('flightsList');
+  const legsList = document.getElementById('legsList');
+  const staysList = document.getElementById('staysList');
+  const timelineEl = document.getElementById('timeline');
+
+  function pillCity(city){
+    const cls = city.includes('Bud')? 'chip-bud': city.includes('Crac')? 'chip-krk' : 'chip-prg';
+    return `<span class="city-chip ${cls}">${city}</span>`;
+  }
+
+  function renderFlights(){
+    flightsList.innerHTML = DATA.flights.map(f=>`
+      <div class="item" role="article">
+        <img src="${f.img}" alt="${f.from} para ${f.to}">
+        <div>
+          <div class="h">${f.from} → ${f.to}</div>
+          <div class="muted">${f.date} • ${f.duration} • ${f.price}</div>
+          <div class="tags" style="margin-top:8px">
+            <a target="_blank" rel="noopener" class="btn primary" href="${f.buyUrl}">Comprar</a>
+            <span class="pill">Voo</span>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function renderLegs(){
+    legsList.innerHTML = DATA.legs.map(leg=>`
+      <details ${leg.cityFrom==='Budapeste'?'open':''}>
+        <summary><strong>${leg.cityFrom} → ${leg.cityTo}</strong></summary>
+        <div class="list pad">
+          ${leg.options.map(o=>`
+            <div class="item">
+              <img src="${o.img}" alt="${o.kind}">
+              <div>
+                <div class="h">${o.kind}</div>
+                <div class="muted">${o.duration} • ${o.price}</div>
+                <div class="tags" style="margin-top:8px">
+                  <a target="_blank" rel="noopener" class="btn" href="${o.buyUrl}">Comprar</a>
+                  <span class="pill">Entre cidades</span>
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </details>
+    `).join('');
+  }
+
+  function renderStays(){
+    staysList.innerHTML = DATA.stays.map(s=>{
+      const chip = s.city==='Budapeste'?'chip-bud': s.city==='Cracóvia'?'chip-krk':'chip-prg';
+      const mapsLink = (s.lat && s.lng)? `https://maps.google.com/?q=${s.lat},${s.lng}` : `https://www.google.com/maps/search/${encodeURIComponent(s.name + ' ' + s.city)}`;
+      return `<div class="item">
+        <img src="${s.img}" alt="${s.name}">
+        <div>
+          <div class="h">${s.name}</div>
+          <div class="muted">${s.city} • ${s.price}</div>
+          <div class="tags" style="margin-top:8px">
+            <a class="btn primary" target="_blank" rel="noopener" href="${s.link}">Reservar</a>
+            <a class="btn ghost" target="_blank" rel="noopener" href="${mapsLink}">Abrir no Maps</a>
+            <span class="city-chip ${chip}">${s.city}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderTimeline(){
+    timelineEl.innerHTML = DATA.itinerary.map((d, idx)=>{
+      const block = (label, obj, dotClass)=> obj? `
+      <div class="t-row">
+        <div><div class="dot ${dotClass}" title="${label}"></div></div>
+        <div class="item" style="grid-template-columns: 96px 1fr">
+          <img src="${obj.img}" alt="${label} ${d.city}">
+          <div>
+            <div class="h">${label}</div>
+            <div class="muted">${obj.text}</div>
+          </div>
+        </div>
+      </div>` : '';
+      return `
+      <details ${idx<2? 'open':''}>
+        <summary><strong>${d.date}</strong> — ${d.label} ${pillCity(d.city)}</summary>
+        <div class="pad">
+          ${block('Manhã', d.morning, 'm')}
+          ${block('Tarde', d.afternoon, 't')}
+          ${block('Noite', d.night, 'n')}
+        </div>
+      </details>`;
+    }).join('');
+  }
+
+  function renderNYE(){
+    const mount = (id, arr)=>{
+      const el = document.getElementById(id);
+      el.innerHTML = arr.map(x=>`
+        <div class="item">
+          <img src="https://placehold.co/300x300?text=NYE" alt="${x.title}">
+          <div>
+            <div class="h">${x.title}</div>
+            <div class="muted">${x.desc}</div>
+            <div class="tags" style="margin-top:8px">
+              <a class="btn" target="_blank" rel="noopener" href="${x.link}">Saber mais / Bilhetes</a>
+              <span class="pill">${x.price}</span>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    };
+    mount('nye-bud', DATA.nye.Budapeste);
+    mount('nye-krk', DATA.nye.Cracóvia);
+    mount('nye-prg', DATA.nye.Praga);
+  }
+
+  // =============================
+  // MAP (Leaflet)
+  // =============================
+  let map;
+  function initMap(){
+    const mapDiv = document.getElementById('map');
+    if(!mapDiv) return;
+    map = L.map('map',{scrollWheelZoom:false});
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    }).addTo(map);
+    const markers = [];
+    DATA.stays.forEach(s=>{
+      if(!s.lat || !s.lng) return; // skip if no coords
+      const color = s.city==='Budapeste'? '#ff4db8' : s.city==='Cracóvia'? '#ffb703' : '#5ec2ff';
+      const marker = L.circleMarker([s.lat, s.lng],{radius:8, color, weight:2, fillColor:color, fillOpacity:.4}).addTo(map);
+      marker.bindPopup(`<strong>${s.name}</strong><br>${s.city}<br><a target="_blank" rel="noopener" href="https://maps.google.com/?q=${s.lat},${s.lng}">Abrir no Maps</a>`);
+      markers.push(marker);
+    });
+    if(markers.length){
+      const group = L.featureGroup(markers);
+      map.fitBounds(group.getBounds().pad(0.2));
+    } else {
+      map.setView([49.0, 17.0], 5); // vista geral Europa Central
+    }
+  }
+
+  // =============================
+  // UX helpers
+  // =============================
+  document.getElementById('copyLink').addEventListener('click', async ()=>{
+    try{ await navigator.clipboard.writeText(location.href); alert('Link copiado!'); }
+    catch{ prompt('Copia manualmente:', location.href); }
+  });
+  document.getElementById('gotoMap').addEventListener('click', ()=>{
+    document.querySelector('a[href="#mapa"]').scrollIntoView({behavior:'smooth'});
+  });
+  document.getElementById('expandAll').addEventListener('click', ()=>{
+    document.querySelectorAll('details').forEach(d=>d.open=true)
+  });
+  document.getElementById('collapseAll').addEventListener('click', ()=>{
+    document.querySelectorAll('details').forEach(d=>d.open=false)
+  });
+
+  // Boot
+  renderFlights();
+  renderLegs();
+  renderStays();
+  renderTimeline();
+  renderNYE();
+  initMap();
+  </script>
+</body>
+</html>
