@@ -173,7 +173,7 @@
           </div>
         </div>
         <p class="muted">Plano pensado para maximizar diversão: ruin bars, pub crawls, termas, mercados e clubes alternativos — tudo no orçamento.</p>
-        <details open>
+        <details>
           <summary>Datas & vibe</summary>
           <div class="list pad">
             <div class="item">
@@ -192,21 +192,6 @@
             </div>
           </div>
         </details>
-      </div></div>
-      <div class="card"><div class="pad">
-        <div class="sec-head">
-          <h3 class="sec-title">Controlo rápido</h3>
-          <div class="tags">
-            <button id="expandAll" class="btn ghost">Expandir tudo</button>
-            <button id="collapseAll" class="btn ghost">Minimizar tudo</button>
-          </div>
-        </div>
-        <ul class="muted" style="line-height:1.7">
-          <li><strong>Âncoras</strong>: usa a barra para saltar entre secções.</li>
-          <li><strong>Imagens</strong>: substitui qualquer <code>placehold.co</code> por fotos reais.</li>
-          <li><strong>Links de compra</strong>: estão com placeholders — troca pelos teus links preferidos (Skyscanner, Hostelworld, etc.).</li>
-          <li><strong>Mapa</strong>: edita coordenadas na secção <em>DATA</em> no fim do ficheiro, se quiseres precisão.</li>
-        </ul>
       </div></div>
     </section>
 
@@ -250,7 +235,7 @@
     <section id="anonovo" class="grid two">
       <div class="card"><div class="pad">
         <div class="sec-head"><h2 class="sec-title">31 de Dezembro — Opções</h2></div>
-        <details open>
+        <details>
           <summary>Budapeste</summary>
           <div class="list pad" id="nye-bud"></div>
         </details>
@@ -446,7 +431,7 @@
 
   function renderLegs(){
     legsList.innerHTML = DATA.legs.map(leg=>`
-      <details ${leg.cityFrom==='Budapeste'?'open':''}>
+      <details>
         <summary><strong>${leg.cityFrom} → ${leg.cityTo}</strong></summary>
         <div class="list pad">
           ${leg.options.map(o=>`
@@ -500,7 +485,7 @@
         </div>
       </div>` : '';
       return `
-      <details ${idx<2? 'open':''}>
+      <details>
         <summary><strong>${d.date}</strong> — ${d.label} ${pillCity(d.city)}</summary>
         <div class="pad">
           ${block('Manhã', d.morning, 'm')}
@@ -569,12 +554,6 @@
   });
   document.getElementById('gotoMap').addEventListener('click', ()=>{
     document.querySelector('a[href="#mapa"]').scrollIntoView({behavior:'smooth'});
-  });
-  document.getElementById('expandAll').addEventListener('click', ()=>{
-    document.querySelectorAll('details').forEach(d=>d.open=true)
-  });
-  document.getElementById('collapseAll').addEventListener('click', ()=>{
-    document.querySelectorAll('details').forEach(d=>d.open=false)
   });
 
   // Boot
